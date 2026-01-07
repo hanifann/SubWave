@@ -12,4 +12,7 @@ sealed interface Routes: NavKey {
 
     @Serializable
     data object LoginRoute: Routes
+
+    @Serializable
+    data object AlbumRoute: Routes
 }
