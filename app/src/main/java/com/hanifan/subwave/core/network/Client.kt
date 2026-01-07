@@ -44,19 +44,22 @@ class ClientInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        // getting cached data from room
+        val cachedData = userRepository.getCachedUser()
+
         val origRequest = chain.request()
         val password = origRequest.url.queryParameter("p") ?: "password"
 
+        val (salt, token) = if (cachedData?.token.isNullOrEmpty() || cachedData.salt.isEmpty()) {
+            val newSalt = generateRandomSalt()
+            val newToken = md5(password + newSalt)
+            newSalt to newToken
+        } else {
+            cachedData.salt to cachedData.token
 
-        // generate random salt
-        val salt = generateRandomSalt()
+        }
 
-        // generate md5 has
-        val token = md5(password + salt)
-
-        // getting url from room
-        val url = userRepository.getCachedUser()?.serverUrl ?: ""
-        val httpUrl = url.toHttpUrl()
+        val httpUrl = cachedData?.serverUrl?.toHttpUrl() ?: origRequest.url
 
         // generate new request
         val newUrlbuilder = origRequest.url.newBuilder()
@@ -70,9 +73,13 @@ class ClientInterceptor @Inject constructor(
             .addQueryParameter("v", API_VERSION)
             .addQueryParameter("t", token)
             .addQueryParameter("s", salt)
-            .build()
+
+        val username = origRequest.url.queryParameter("u") ?: cachedData?.username
+        if(!username.isNullOrEmpty()) {
+            newUrlbuilder.addQueryParameter("u", username)
+        }
         val newRequest = origRequest.newBuilder()
-            .url(newUrlbuilder)
+            .url(newUrlbuilder.build())
             .build()
 
         return chain.proceed(newRequest)
