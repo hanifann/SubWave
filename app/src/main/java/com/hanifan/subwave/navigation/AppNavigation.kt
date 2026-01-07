@@ -1,11 +1,7 @@
 package com.hanifan.subwave.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -14,6 +10,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.hanifan.subwave.ui.screen.album.AlbumScreen
 import com.hanifan.subwave.ui.screen.home.HomeScreen
 import com.hanifan.subwave.ui.screen.login.LoginScreen
 
@@ -34,18 +31,24 @@ fun AppNavigation(
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<Routes.LoginRoute> {
-                LoginScreen()
+                LoginScreen(
+                    onNavigate = { route ->
+                        backStack.clear()
+                        backStack.add(route)
+                    }
+                )
             }
             entry<Routes.HomeRoute> {
                 HomeScreen(
-                    onNavigate = { route -> backStack.add(route) }
+                    onNavigate = { route -> backStack.add(route)
+                    }
                 )
             }
-            entry<Routes.SectionDetailRoute> {
-                Scaffold {
-                    Text("asdasdas", modifier = Modifier
-                        .padding(it))
-                }
+            entry<Routes.AlbumRoute> {
+                AlbumScreen(
+                    onNavigate = { route -> backStack.add(route) },
+                    title = "test"
+                )
             }
         }
     )
