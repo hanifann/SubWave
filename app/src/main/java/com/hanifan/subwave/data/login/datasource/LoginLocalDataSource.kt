@@ -1,4 +1,4 @@
-package com.hanifan.subwave.data.login.data_source
+package com.hanifan.subwave.data.login.datasource
 
 import com.hanifan.subwave.core.storage.AppDatabase
 import com.hanifan.subwave.domain.login.model.User
