@@ -4,10 +4,12 @@ import com.hanifan.subwave.core.storage.DataStoreHelper
 import com.hanifan.subwave.core.storage.DataStoreHelperImpl
 import com.hanifan.subwave.core.storage.SqlCipherKeyManager
 import com.hanifan.subwave.core.storage.SqlCipherKeyManagerHelper
-import com.hanifan.subwave.data.login.data_source.LoginLocalDataSource
-import com.hanifan.subwave.data.login.data_source.LoginLocalDataSourceImpl
+import com.hanifan.subwave.data.home.repository.HomeRepositoryImpl
+import com.hanifan.subwave.data.login.datasource.LoginLocalDataSource
+import com.hanifan.subwave.data.login.datasource.LoginLocalDataSourceImpl
 import com.hanifan.subwave.data.login.repository.LoginRepositoryImpl
 import com.hanifan.subwave.data.login.repository.UserRepositoryImpl
+import com.hanifan.subwave.domain.home.repository.HomeRepository
 import com.hanifan.subwave.domain.login.repository.LoginRepository
 import com.hanifan.subwave.domain.login.repository.UserRepository
 import dagger.Binds
@@ -26,6 +28,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindsUserRepository(impl: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsTopSongRepository(impl: HomeRepositoryImpl): HomeRepository
 
     @Binds
     @Singleton
