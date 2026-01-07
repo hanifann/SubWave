@@ -12,5 +12,6 @@ data class User (
     val streamRole: Boolean,
     val isLoggedIn: Boolean = false,
     val serverUrl: String = "",
-    val token: String = ""
+    val token: String = "",
+    val salt: String = ""
 )
