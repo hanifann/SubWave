@@ -13,7 +13,8 @@ import com.hanifan.subwave.common.Constant
 import com.hanifan.subwave.core.network.ClientInterceptor
 import com.hanifan.subwave.core.storage.AppDatabase
 import com.hanifan.subwave.core.storage.SqlCipherKeyManager
-import com.hanifan.subwave.data.login.data_source.LoginRemoteDataSource
+import com.hanifan.subwave.data.home.datasource.HomeRemoteDataSource
+import com.hanifan.subwave.data.login.datasource.LoginRemoteDataSource
 import com.hanifan.subwave.domain.login.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -48,6 +49,12 @@ object AppModule {
     @Singleton
     fun provideLoginRemoteDataSource(httpClient: Retrofit): LoginRemoteDataSource {
         return httpClient.create(LoginRemoteDataSource::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTopSongRemoteDataSource(httpClient: Retrofit): HomeRemoteDataSource {
+        return httpClient.create(HomeRemoteDataSource::class.java)
     }
 
     @Provides
