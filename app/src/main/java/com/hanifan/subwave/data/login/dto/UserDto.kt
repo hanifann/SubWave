@@ -10,6 +10,8 @@ data class UserDto(
     val adminRole: Boolean,
     val downloadRole: Boolean,
     val streamRole: Boolean,
+    val token: String?,
+    val salt: String?
 )
 
 fun UserDto.toUser(): User = User(
@@ -17,5 +19,7 @@ fun UserDto.toUser(): User = User(
         scrobblingEnabled =  scrobblingEnabled,
         adminRole =  adminRole,
         downloadRole =  downloadRole,
-        streamRole =  streamRole
+        streamRole =  streamRole,
+        token =  token!!,
+        salt =  salt!!
     )
