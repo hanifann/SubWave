@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface LoginRepository {
     suspend fun authentication(
         username: String,
-        password: String
+        password: String,
+        baseUrl: String
     ): Flow<Resource<User>>
 }
