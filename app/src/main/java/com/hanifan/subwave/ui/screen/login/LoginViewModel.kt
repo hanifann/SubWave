@@ -6,6 +6,7 @@ import com.hanifan.subwave.common.Resource
 import com.hanifan.subwave.domain.login.model.User
 import com.hanifan.subwave.domain.login.repository.LoginRepository
 import com.hanifan.subwave.domain.login.repository.UserRepository
+import com.hanifan.subwave.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,47 +54,21 @@ class LoginViewModel @Inject constructor(
         _authState.value = AuthState()
     }
 
-    fun login() {
+    fun login(onSuccess: (route: Routes) -> Unit) {
         viewModelScope.launch {
-            userRepository.saveUser(
-                User(
-                    username = loginState.value.username,
-                    scrobblingEnabled = false,
-                    adminRole = false,
-                    downloadRole = false,
-                    streamRole = false,
-                    isLoggedIn = true,
-                    serverUrl = "${httpScheme.value}://${loginState.value.url}",
-                )
-            )
             userRepository.refreshUser()
             repository.authentication(
                 username = loginState.value.username,
-                password = loginState.value.password
+                password = loginState.value.password,
+                baseUrl = "${httpScheme.value}://${loginState.value.url}",
             ).collect { result ->
                 when (result) {
                     is Resource.Success -> {
-                        _authState.value = _authState.value.copy(
-                            isAuthenticated = true,
-                            isLoading = false
-                        )
+                        handleLoginSuccess(result.data)
+                        onSuccess(Routes.HomeRoute)
                     }
                     is Resource.Error -> {
-                        _authState.value = _authState.value.copy(
-                            isLoading = false,
-                            errorMessage = result.message
-                        )
-                        userRepository.deleteUser(
-                            User(
-                                username = loginState.value.username,
-                                scrobblingEnabled = false,
-                                adminRole = false,
-                                downloadRole = false,
-                                streamRole = false,
-                                isLoggedIn = true,
-                                serverUrl = "${httpScheme.value}://${loginState.value.url}",
-                            )
-                        )
+                        handleLoginFailed(result.message)
                     }
                     is Resource.Loading -> {
                         _authState.value = _authState.value.copy(
@@ -103,5 +78,45 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+    private suspend fun handleLoginSuccess(user: User?) {
+        if (user == null) {
+            _authState.value = _authState.value.copy(
+                isLoading = false,
+                errorMessage = "User data is missing"
+            )
+        }
+
+        userRepository.saveUser(
+            // use force unwrap becasuse null already checked above
+            user!!.copy(
+                serverUrl = "${httpScheme.value}://${loginState.value.url}",
+                isLoggedIn = true,
+                username = loginState.value.username
+            )
+        )
+        _authState.value = _authState.value.copy(
+            isAuthenticated = true,
+            isLoading = false,
+            errorMessage = null
+        )
+    }
+
+    private suspend fun handleLoginFailed(message: String?) {
+        userRepository.deleteUser(
+            User(
+                username = loginState.value.username,
+                scrobblingEnabled = false,
+                adminRole = false,
+                downloadRole = false,
+                streamRole = false,
+                isLoggedIn = true,
+                serverUrl = "${httpScheme.value}://${loginState.value.url}",
+            )
+        )
+        _authState.value = _authState.value.copy(
+            isLoading = false,
+            errorMessage = message
+        )
     }
 }
