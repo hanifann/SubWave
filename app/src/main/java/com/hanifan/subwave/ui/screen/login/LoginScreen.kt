@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hanifan.subwave.navigation.Routes
 import com.hanifan.subwave.ui.component.CustomTextField
 import com.hanifan.subwave.ui.component.ErrorDialog
 import com.hanifan.subwave.ui.component.LoadingDialog
@@ -46,7 +47,8 @@ import com.hanifan.subwave.ui.component.LoadingDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    onNavigate: (route: Routes) -> Unit
 ) {
     var isHidden by remember { mutableStateOf(true) }
 
@@ -169,7 +171,7 @@ fun LoginScreen(
                         loginState.username.isNotEmpty() &&
                         loginState.url.isNotEmpty(),
                 onClick = {
-                    viewModel.login()
+                    viewModel.login(onNavigate)
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
